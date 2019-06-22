@@ -26,7 +26,7 @@
 	"require-dev": {
 		"vimeo/psalm": "*",
 		"mediawiki/mediawiki-codesniffer": "*",
-		"phpunit/phpunit": "4.5.*"
+		"phpunit/phpunit": "~5.0"
 	},
 	"autoload": {
 		"psr-4": {
