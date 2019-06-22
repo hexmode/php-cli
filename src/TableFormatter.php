@@ -54,7 +54,7 @@ class TableFormatter {
 	 *
 	 * @param string $border
 	 */
-	public function setBorder( $border ) {
+	public function setBorder( $border ) :void {
 		$this->border = $border;
 	}
 
@@ -74,7 +74,7 @@ class TableFormatter {
 	 *
 	 * @param int $max
 	 */
-	public function setMaxWidth( $max ) {
+	public function setMaxWidth( $max ) :void {
 		$this->max = $max;
 	}
 
@@ -241,7 +241,7 @@ class TableFormatter {
 	 * @param $string
 	 * @return int
 	 */
-	protected function strlen( $string ) {
+	protected function strlen( $string ) :int {
 		// don't count color codes
 		$string = preg_replace( "/\33\\[\\d+(;\\d+)?m/", '', $string );
 
@@ -262,7 +262,12 @@ class TableFormatter {
 		if ( function_exists( 'mb_substr' ) ) {
 			return mb_substr( $string, $start, $length );
 		} else {
-			return substr( $string, $start, $length );
+			// substr() treats the third parameter different than mb_substr()
+			if ( $length ) {
+				return substr( $string, $start, $length );
+			} else {
+				return substr( $string, $start );
+			}
 		}
 	}
 

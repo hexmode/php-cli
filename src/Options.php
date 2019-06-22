@@ -5,8 +5,9 @@ namespace splitbrain\phpcli;
 /**
  * Class Options
  *
- * Parses command line options passed to the CLI script. Allows CLI scripts to easily register all accepted options and
- * commands and even generates a help text from this setup.
+ * Parses command line options passed to the CLI script. Allows CLI
+ * scripts to easily register all accepted options and commands and
+ * even generates a help text from this setup.
  *
  * @author Andreas Gohr <andi@splitbrain.org>
  * @license MIT
@@ -62,7 +63,7 @@ class Options {
 	 *
 	 * @param string $help
 	 */
-	public function setHelp( $help ) {
+	public function setHelp( $help ) :void {
 		$this->setup['']['help'] = $help;
 	}
 
@@ -71,7 +72,7 @@ class Options {
 	 *
 	 * @param string $help
 	 */
-	public function setCommandHelp( $help ) {
+	public function setCommandHelp( $help ) :void {
 		$this->setup['']['commandhelp'] = $help;
 	}
 
@@ -80,12 +81,13 @@ class Options {
 	 *
 	 * @param bool $compact
 	 */
-	public function setCompactHelp( $compact = true ) {
+	public function setCompactHelp( $compact = true ) :void {
 		$this->setup['']['compacthelp'] = $compact;
 	}
 
 	/**
-	 * Register the names of arguments for help generation and number checking
+	 * Register the names of arguments for help generation and number
+	 * checking
 	 *
 	 * This has to be called in the order arguments are expected
 	 *
@@ -95,7 +97,12 @@ class Options {
 	 * @param string $command if theses apply to a sub command only
 	 * @throws Exception
 	 */
-	public function registerArgument( $arg, $help, $required = true, $command = '' ) {
+	public function registerArgument(
+		string $arg,
+		string $help,
+		bool $required = true,
+		string $command = ''
+	) :void {
 		if ( !isset( $this->setup[$command] ) ) {
 			throw new Exception( "Command $command not registered" );
 		}
@@ -110,13 +117,14 @@ class Options {
 	/**
 	 * This registers a sub command
 	 *
-	 * Sub commands have their own options and use their own function (not main()).
+	 * Sub commands have their own options and use their own function
+	 * (not main()).
 	 *
 	 * @param string $command
 	 * @param string $help
 	 * @throws Exception
 	 */
-	public function registerCommand( $command, $help ) {
+	public function registerCommand( $command, $help ) :void {
 		if ( isset( $this->setup[$command] ) ) {
 			throw new Exception( "Command $command already registered" );
 		}
@@ -134,11 +142,18 @@ class Options {
 	 * @param string $long multi character option (specified with --)
 	 * @param string $help help text for this option
 	 * @param string|null $short one character option (specified with -)
-	 * @param bool|string $needsarg does this option require an argument? give it a name here
+	 * @param bool|string $needsarg does this option require an argument?
+	 *   give it a name here
 	 * @param string $command what command does this option apply to
 	 * @throws Exception
 	 */
-	public function registerOption( $long, $help, $short = null, $needsarg = false, $command = '' ) {
+	public function registerOption(
+		string $long,
+		string $help,
+		?string $short = null,
+		$needsarg = false,
+		string $command = ''
+	) :void {
 		if ( !isset( $this->setup[$command] ) ) {
 			throw new Exception( "Command $command not registered" );
 		}
@@ -163,11 +178,13 @@ class Options {
 	 *
 	 * Throws an exception if arguments are missing.
 	 *
-	 * This is run from CLI automatically and usually does not need to be called directly
+	 * This is run from CLI automatically and usually does not need to
+	 * be called directly
 	 *
-	 * @throws Exception
+	 * @returns bool true if all is ok
+	 * @throws UsageException
 	 */
-	public function checkArguments() {
+	public function checkArguments() :bool {
 		$argc = count( $this->args );
 
 		$req = 0;
@@ -179,46 +196,60 @@ class Options {
 		}
 
 		if ( $req > $argc ) {
-			throw new Exception( "Not enough arguments", Exception::E_OPT_ARG_REQUIRED );
+			throw new UsageException(
+				"Not enough arguments", Exception::E_OPT_ARG_REQUIRED
+			);
 		}
+
+		return true;
 	}
 
 	/**
 	 * Parses the given arguments for known options and command
 	 *
-	 * The given $args array should NOT contain the executed file as first item anymore! The $args
-	 * array is stripped from any options and possible command. All found otions can be accessed via the
-	 * getOpt() function
+	 * The given $args array should NOT contain the executed file as
+	 * first item anymore! The $args array is stripped from any
+	 * options and possible command. All found otions can be accessed
+	 * via the getOpt() function
 	 *
-	 * Note that command options will overwrite any global options with the same name
+	 * Note that command options will overwrite any global options
+	 * with the same name
 	 *
-	 * This is run from CLI automatically and usually does not need to be called directly
+	 * This is run from CLI automatically and usually does not need to
+	 * be called directly
 	 *
 	 * @throws Exception
 	 */
-	public function parseOptions() {
+	public function parseOptions() :void {
 		$non_opts = [];
 
 		$argc = count( $this->args );
 		for ( $i = 0; $i < $argc; $i++ ) {
 			$arg = $this->args[$i];
 
-			// The special element '--' means explicit end of options. Treat the rest of the arguments as non-options
+			// The special element '--' means explicit end of
+			// options. Treat the rest of the arguments as non-options
 			// and end the loop.
 			if ( $arg == '--' ) {
-				$non_opts = array_merge( $non_opts, array_slice( $this->args, $i + 1 ) );
+				$non_opts = array_merge(
+					$non_opts, array_slice( $this->args, $i + 1 )
+				);
 				break;
 			}
 
 			// '-' is stdin - a normal argument
 			if ( $arg == '-' ) {
-				$non_opts = array_merge( $non_opts, array_slice( $this->args, $i ) );
+				$non_opts = array_merge(
+					$non_opts, array_slice( $this->args, $i )
+				);
 				break;
 			}
 
 			// first non-option
 			if ( $arg{0} != '-' ) {
-				$non_opts = array_merge( $non_opts, array_slice( $this->args, $i ) );
+				$non_opts = array_merge(
+					$non_opts, array_slice( $this->args, $i )
+				);
 				break;
 			}
 
@@ -229,12 +260,17 @@ class Options {
 				$val = array_shift( $arg );
 
 				if ( !isset( $this->setup[$this->command]['opts'][$opt] ) ) {
-					throw new Exception( "No such option '$opt'", Exception::E_UNKNOWN_OPT );
+					throw new UsageException(
+						"No such option '$opt'", Exception::E_UNKNOWN_OPT
+					);
 				}
 
 				// argument required?
 				if ( $this->setup[$this->command]['opts'][$opt]['needsarg'] ) {
-					if ( is_null( $val ) && $i + 1 < $argc && !preg_match( '/^--?[\w]/', $this->args[$i + 1] ) ) {
+					if (
+						is_null( $val ) && $i + 1 < $argc &&
+						!preg_match( '/^--?[\w]/', $this->args[$i + 1] )
+					) {
 						$val = $this->args[++$i];
 					}
 					if ( is_null( $val ) ) {
@@ -252,15 +288,21 @@ class Options {
 			// short option
 			$opt = substr( $arg, 1 );
 			if ( !isset( $this->setup[$this->command]['short'][$opt] ) ) {
-				throw new Exception( "No such option $arg", Exception::E_UNKNOWN_OPT );
+				throw new UsageException(
+					"No such option $arg", Exception::E_UNKNOWN_OPT
+				);
 			} else {
-				$opt = $this->setup[$this->command]['short'][$opt]; // store it under long name
+				// store it under long name
+				$opt = $this->setup[$this->command]['short'][$opt];
 			}
 
 			// argument required?
 			if ( $this->setup[$this->command]['opts'][$opt]['needsarg'] ) {
 				$val = null;
-				if ( $i + 1 < $argc && !preg_match( '/^--?[\w]/', $this->args[$i + 1] ) ) {
+				if (
+					$i + 1 < $argc &&
+					!preg_match( '/^--?[\w]/', $this->args[$i + 1] )
+				) {
 					$val = $this->args[++$i];
 				}
 				if ( is_null( $val ) ) {
@@ -276,8 +318,12 @@ class Options {
 		// parsing is now done, update args array
 		$this->args = $non_opts;
 
-		// if not done yet, check if first argument is a command and reexecute argument parsing if it is
-		if ( !$this->command && $this->args && isset( $this->setup[$this->args[0]] ) ) {
+		// if not done yet, check if first argument is a command and
+		// reexecute argument parsing if it is
+		if (
+			!$this->command && $this->args &&
+			isset( $this->setup[$this->args[0]] )
+		) {
 			// it is a command!
 			$this->command = array_shift( $this->args );
 			$this->parseOptions(); // second pass

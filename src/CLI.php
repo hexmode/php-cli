@@ -19,7 +19,8 @@ abstract class CLI {
 	/** @var  Colors */
 	public $colors;
 
-	/** @var array PSR-3 compatible loglevels and their prefix, color, output channel */
+	/** @var array PSR-3 compatible loglevels and their prefix, color,
+	 * output channel */
 	protected $loglevel = [
 		'debug' => [ '', Colors::C_LIGHTGRAY, STDOUT ],
 		'info' => [ 'ℹ ', Colors::C_CYAN, STDOUT ],
@@ -246,21 +247,21 @@ abstract class CLI {
 	}
 
 	/**
-	 * Runtime errors that do not require immediate action but should typically
-	 * be logged and monitored.
+	 * Runtime errors that do not require immediate action but should
+	 * typically be logged and monitored.
 	 *
 	 * @param string $message
 	 * @param array $context
 	 */
-	public function error( string $message, array $context = [] ) :void {
+	public function error( $message, array $context = [] ) :void {
 		$this->log( 'error', $message, $context );
 	}
 
 	/**
 	 * Exceptional occurrences that are not errors.
 	 *
-	 * Example: Use of deprecated APIs, poor use of an API, undesirable things
-	 * that are not necessarily wrong.
+	 * Example: Use of deprecated APIs, poor use of an API, undesirable
+	 * things that are not necessarily wrong.
 	 *
 	 * @param string $message
 	 * @param array $context
@@ -344,8 +345,11 @@ abstract class CLI {
 		$replace = [];
 		foreach ( $context as $key => $val ) {
 			// check that the value can be casted to string
-			if ( !is_array( $val ) &&
-				 ( !is_object( $val ) || method_exists( $val, '__toString' ) )
+			if (
+				!is_array( $val ) && (
+					 !is_object( $val ) ||
+					 method_exists( $val, '__toString' )
+				)
 			) {
 				$replace['{' . $key . '}'] = $val;
 			}
