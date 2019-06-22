@@ -11,7 +11,8 @@ namespace splitbrain\phpcli;
  * @license MIT
  */
 class Colors {
-	// these constants make IDE autocompletion easier, but color names can also be passed as strings
+	// these constants make IDE autocompletion easier, but color names
+	// can also be passed as strings
 	const C_RESET = 'reset';
 	const C_BLACK = 'black';
 	const C_DARKGRAY = 'darkgray';
@@ -60,7 +61,10 @@ class Colors {
 	 * Tries to disable colors for non-terminals
 	 */
 	public function __construct() {
-		if ( function_exists( 'posix_isatty' ) && !posix_isatty( STDOUT ) ) {
+		if (
+			function_exists( 'posix_isatty' ) &&
+			!posix_isatty( STDOUT )
+		) {
 			$this->enabled = false;
 			return;
 		}
@@ -73,41 +77,43 @@ class Colors {
 	/**
 	 * enable color output
 	 */
-	public function enable() {
+	public function enable() :void {
 		$this->enabled = true;
 	}
 
 	/**
 	 * disable color output
 	 */
-	public function disable() {
+	public function disable() :void {
 		$this->enabled = false;
 	}
 
 	/**
 	 * @return bool is color support enabled?
 	 */
-	public function isEnabled() {
+	public function isEnabled() :bool {
 		return $this->enabled;
 	}
 
 	/**
 	 * Convenience function to print a line in a given color
 	 *
-	 * @param string $line the line to print, a new line is added automatically
+	 * @param string $line the line to print, a new line is added
+	 *    automatically
 	 * @param string $color one of the available color names
 	 * @param resource $channel file descriptor to write to
 	 *
 	 * @throws Exception
 	 */
-	public function ptln( $line, $color, $channel = STDOUT ) {
+	public function ptln( $line, $color, $channel = STDOUT ) :void {
 		$this->set( $color );
 		fwrite( $channel, rtrim( $line ) . "\n" );
 		$this->reset();
 	}
 
 	/**
-	 * Returns the given text wrapped in the appropriate color and reset code
+	 * Returns the given text wrapped in the appropriate color and
+	 * reset code
 	 *
 	 * @param string $text string to wrap
 	 * @param string $color one of the available color names
@@ -115,7 +121,8 @@ class Colors {
 	 * @throws Exception
 	 */
 	public function wrap( $text, $color ) {
-		return $this->getColorCode( $color ) . $text . $this->getColorCode( 'reset' );
+		return $this->getColorCode( $color )
+			. $text . $this->getColorCode( 'reset' );
 	}
 
 	/**
@@ -143,7 +150,7 @@ class Colors {
 	 * @param resource $channel file descriptor to write to
 	 * @throws Exception
 	 */
-	public function set( $color, $channel = STDOUT ) {
+	public function set( $color, $channel = STDOUT ) :void {
 		fwrite( $channel, $this->getColorCode( $color ) );
 	}
 
@@ -154,7 +161,7 @@ class Colors {
 	 *
 	 * @throws Exception
 	 */
-	public function reset( $channel = STDOUT ) {
+	public function reset( $channel = STDOUT ) :void {
 		$this->set( 'reset', $channel );
 	}
 }

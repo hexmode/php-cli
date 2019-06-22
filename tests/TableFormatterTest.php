@@ -5,15 +5,20 @@ namespace splitbrain\phpcli\tests;
 use splitbrain\phpcli\Colors;
 
 class TableFormatter extends \splitbrain\phpcli\TableFormatter {
-	public function calculateColLengths( $columns ) {
+	public function calculateColLengths( $columns ) :array {
 		return parent::calculateColLengths( $columns );
 	}
 
-	public function strlen( $string ) {
+	public function strlen( string $string ) :int {
 		return parent::strlen( $string );
 	}
 
-	public function wordwrap( $str, $width = 75, $break = "\n", $cut = false ) {
+	public function wordwrap(
+		string $str,
+		int $width = 75,
+		string $break = "\n",
+		bool $cut = false
+	) :string {
 		return parent::wordwrap( $str, $width, $break, $cut );
 	}
 
@@ -59,21 +64,26 @@ class TableFormatterTest extends \PHPUnit\Framework\TestCase {
 	 * @param int $max
 	 * @param string $border
 	 */
-	public function test_calc( $input, $expect, $max = 100, $border = ' ' ) {
+	public function test_calc(
+		$input, $expect, $max = 100, $border = ' '
+	) :void {
 		$tf = new TableFormatter();
 		$tf->setMaxWidth( $max );
 		$tf->setBorder( $border );
 
 		$result = $tf->calculateColLengths( $input );
 
-		$this->assertEquals( $max, array_sum( $result ) + ( strlen( $border ) * ( count( $input ) - 1 ) ) );
+		$this->assertEquals(
+			$max, array_sum( $result ) +
+			( strlen( $border ) * ( count( $input ) - 1 ) )
+		);
 		$this->assertEquals( $expect, $result );
 	}
 
 	/**
 	 * Check wrapping
 	 */
-	public function test_wrap() {
+	public function test_wrap() :void {
 		$text = "this is a long string something\n" .
 			"123456789012345678901234567890";
 
@@ -87,7 +97,7 @@ class TableFormatterTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals( $expt, $tf->wordwrap( $text, 15, "\n", true ) );
 	}
 
-	public function test_length() {
+	public function test_length() :void {
 		$text = "this is häppy ☺";
 		$expect = "$text     |test";
 
@@ -98,7 +108,7 @@ class TableFormatterTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals( $expect, trim( $result ) );
 	}
 
-	public function test_colorlength() {
+	public function test_colorlength() :void {
 		$color = new Colors();
 
 		$text = 'this is ' . $color->wrap( 'green', Colors::C_GREEN );
@@ -111,7 +121,7 @@ class TableFormatterTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals( $expect, trim( $result ) );
 	}
 
-	public function test_onewrap() {
+	public function test_onewrap() :void {
 		$col1 = "test\nwrap";
 		$col2 = "test";
 

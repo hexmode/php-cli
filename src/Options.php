@@ -166,7 +166,10 @@ class Options {
 
 		if ( $short ) {
 			if ( strlen( $short ) > 1 ) {
-				throw new Exception( "Short options should be exactly one ASCII character" );
+				throw new UsageException(
+					"Short options should be exactly one ASCII character",
+					E_UNKNOWN_OPT
+				);
 			}
 
 			$this->setup[$command]['short'][$short] = $long;
@@ -266,7 +269,9 @@ class Options {
 				}
 
 				// argument required?
-				if ( $this->setup[$this->command]['opts'][$opt]['needsarg'] ) {
+				if (
+					$this->setup[$this->command]['opts'][$opt]['needsarg']
+				) {
 					if (
 						is_null( $val ) && $i + 1 < $argc &&
 						!preg_match( '/^--?[\w]/', $this->args[$i + 1] )
@@ -274,8 +279,10 @@ class Options {
 						$val = $this->args[++$i];
 					}
 					if ( is_null( $val ) ) {
-						throw new Exception( "Option $opt requires an argument",
-							Exception::E_OPT_ARG_REQUIRED );
+						throw new Exception(
+							"Option $opt requires an argument",
+							Exception::E_OPT_ARG_REQUIRED
+						);
 					}
 					$this->options[$opt] = $val;
 				} else {
@@ -333,8 +340,8 @@ class Options {
 	/**
 	 * Get the value of the given option
 	 *
-	 * Please note that all options are accessed by their long option names regardless of how they were
-	 * specified on commandline.
+	 * Please note that all options are accessed by their long option
+	 * names regardless of how they were specified on commandline.
 	 *
 	 * Can only be used after parseOptions() has been run
 	 *
@@ -358,23 +365,25 @@ class Options {
 	 *
 	 * @return string
 	 */
-	public function getCmd() {
+	public function getCmd() :string {
 		return $this->command;
 	}
 
 	/**
 	 * Get all the arguments passed to the script
 	 *
-	 * This will not contain any recognized options or the script name itself
+	 * This will not contain any recognized options or the script name
+	 * itself
 	 *
 	 * @return array
 	 */
-	public function getArgs() {
+	public function getArgs() :array {
 		return $this->args;
 	}
 
 	/**
-	 * Builds a help screen from the available options. You may want to call it from -h or on error
+	 * Builds a help screen from the available options. You may want
+	 * to call it from -h or on error
 	 *
 	 * @return string
 	 *
@@ -386,7 +395,8 @@ class Options {
 
 		$hascommands = ( count( $this->setup ) > 1 );
 		$commandhelp = $this->setup[""]["commandhelp"]
-					 ?: 'This tool accepts a command as first parameter as outlined below:';
+					 ?: 'This tool accepts a command as first '
+					 . 'parameter as outlined below:';
 		$compacthelp = $this->setup[""]["compacthelp"] ?: false;
 
 		foreach ( $this->setup as $command => $config ) {
@@ -403,20 +413,28 @@ class Options {
 				if ( !$compacthelp ) {
 					$text .= "\n";
 				}
-				$text .= $this->colors->wrap( '   ' . $command, Colors::C_PURPLE );
+				$text .= $this->colors->wrap(
+					'   ' . $command, Colors::C_PURPLE
+				);
 				$mv = 4;
 			}
 
 			if ( $hasopts ) {
-				$text .= ' ' . $this->colors->wrap( '<OPTIONS>', Colors::C_GREEN );
+				$text .= ' ' . $this->colors->wrap(
+					'<OPTIONS>', Colors::C_GREEN
+				);
 			}
 
 			if ( !$command && $hascommands ) {
-				$text .= ' ' . $this->colors->wrap( '<COMMAND> ...', Colors::C_PURPLE );
+				$text .= ' ' . $this->colors->wrap(
+					'<COMMAND> ...', Colors::C_PURPLE
+				);
 			}
 
 			foreach ( $this->setup[$command]['args'] as $arg ) {
-				$out = $this->colors->wrap( '<' . $arg['name'] . '>', Colors::C_CYAN );
+				$out = $this->colors->wrap(
+					'<' . $arg['name'] . '>', Colors::C_CYAN
+				);
 
 				if ( !$arg['required'] ) {
 					$out = '[' . $out . ']';
@@ -441,7 +459,9 @@ class Options {
 			if ( $hasopts ) {
 				if ( !$command ) {
 					$text .= "\n";
-					$text .= $this->colors->wrap( 'OPTIONS:', Colors::C_BROWN );
+					$text .= $this->colors->wrap(
+						'OPTIONS:', Colors::C_BROWN
+					);
 				}
 				$text .= "\n";
 				foreach ( $this->setup[$command]['opts'] as $long => $opt ) {
@@ -475,7 +495,9 @@ class Options {
 			if ( $hasargs ) {
 				if ( !$command ) {
 					$text .= "\n";
-					$text .= $this->colors->wrap( 'ARGUMENTS:', Colors::C_BROWN );
+					$text .= $this->colors->wrap(
+						'ARGUMENTS:', Colors::C_BROWN
+					);
 				}
 				if ( !$compacthelp ) {
 					$text .= "\n";
@@ -510,8 +532,9 @@ class Options {
 	}
 
 	/**
-	 * Safely read the $argv PHP array across different PHP configurations.
-	 * Will take care on register_globals and register_argc_argv ini directives
+	 * Safely read the $argv PHP array across different PHP
+	 * configurations.  Will take care on register_globals and
+	 * register_argc_argv ini directives
 	 *
 	 * @throws Exception
 	 * @return array the $argv PHP array or PEAR error if not registered

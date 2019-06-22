@@ -9,7 +9,7 @@ class Options extends \splitbrain\phpcli\Options {
 
 class OptionsTest extends \PHPUnit\Framework\TestCase {
 
-	function test_simpleshort() {
+	function test_simpleshort() :void {
 		$options = new Options();
 		$options->registerOption( 'exclude', 'exclude files', 'x', 'file' );
 
@@ -21,7 +21,7 @@ class OptionsTest extends \PHPUnit\Framework\TestCase {
 		$this->assertFalse( $options->getOpt( 'nothing' ) );
 	}
 
-	function test_simplelong1() {
+	function test_simplelong1() :void {
 		$options = new Options();
 		$options->registerOption( 'exclude', 'exclude files', 'x', 'file' );
 
@@ -33,7 +33,7 @@ class OptionsTest extends \PHPUnit\Framework\TestCase {
 		$this->assertFalse( $options->getOpt( 'nothing' ) );
 	}
 
-	function test_simplelong2() {
+	function test_simplelong2() :void {
 		$options = new Options();
 		$options->registerOption( 'exclude', 'exclude files', 'x', 'file' );
 
@@ -45,12 +45,14 @@ class OptionsTest extends \PHPUnit\Framework\TestCase {
 		$this->assertFalse( $options->getOpt( 'nothing' ) );
 	}
 
-	function test_complex() {
+	function test_complex() :void {
 		$options = new Options();
 
 		$options->registerOption( 'plugins', 'run on plugins only', 'p' );
 		$options->registerCommand( 'status', 'display status info' );
-		$options->registerOption( 'long', 'display long lines', 'l', false, 'status' );
+		$options->registerOption(
+			'long', 'display long lines', 'l', false, 'status'
+		);
 
 		$options->args = [ '-p', 'status', '--long', 'foo' ];
 		$options->parseOptions();

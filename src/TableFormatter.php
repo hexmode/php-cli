@@ -44,7 +44,7 @@ class TableFormatter {
 	 *
 	 * @return string
 	 */
-	public function getBorder() {
+	public function getBorder() :string {
 		return $this->border;
 	}
 
@@ -65,7 +65,7 @@ class TableFormatter {
 	 *
 	 * @return int
 	 */
-	public function getMaxWidth() {
+	public function getMaxWidth() :int {
 		return $this->max;
 	}
 
@@ -83,9 +83,10 @@ class TableFormatter {
 	 *
 	 * @return int terminal width, 0 if unknown
 	 */
-	protected function getTerminalWidth() {
+	protected function getTerminalWidth() :int {
 		// from environment
-		if ( isset( $_SERVER['COLUMNS'] ) ) { return (int)$_SERVER['COLUMNS'];
+		if ( isset( $_SERVER['COLUMNS'] ) ) {
+			return (int)$_SERVER['COLUMNS'];
 		}
 
 		// via tput
@@ -100,20 +101,24 @@ class TableFormatter {
 	}
 
 	/**
-	 * Takes an array with dynamic column width and calculates the correct width
+	 * Takes an array with dynamic column width and calculates the
+	 * correct width
 	 *
-	 * Column width can be given as fixed char widths, percentages and a single * width can be given
-	 * for taking the remaining available space. When mixing percentages and fixed widths, percentages
-	 * refer to the remaining space after allocating the fixed width
+	 * Column width can be given as fixed char widths, percentages and
+	 * a single * width can be given for taking the remaining
+	 * available space. When mixing percentages and fixed widths,
+	 * percentages refer to the remaining space after allocating the
+	 * fixed width
 	 *
 	 * @param array $columns
 	 * @return int[]
 	 * @throws Exception
 	 */
-	protected function calculateColLengths( $columns ) {
+	protected function calculateColLengths( $columns ) :array {
 		$idx = 0;
 		$border = $this->strlen( $this->border );
-		$fixed = ( count( $columns ) - 1 ) * $border; // borders are used already
+		// borders are used already
+		$fixed = ( count( $columns ) - 1 ) * $border;
 		$fluid = -1;
 
 		// first pass for format check and fixed columns
@@ -157,7 +162,9 @@ class TableFormatter {
 
 		$remain = $this->max - $alloc;
 		if ( $remain < 0 ) {
-			throw new Exception( "Wanted column widths exceed available space" );
+			throw new Exception(
+				"Wanted column widths exceed available space"
+			);
 		}
 
 		// assign remaining space
@@ -173,20 +180,26 @@ class TableFormatter {
 	/**
 	 * Displays text in multiple word wrapped columns
 	 *
-	 * @param int[] $columns list of column widths (in characters, percent or '*')
+	 * @param array $columns list of column widths (in characters,
+	 *   percent or '*')
 	 * @param string[] $texts list of texts for each column
-	 * @param array $colors A list of color names to use for each column. use empty string for default
+	 * @param array $colors A list of color names to use for each
+	 *   column. use empty string for default
 	 * @return string
 	 * @throws Exception
 	 */
-	public function format( $columns, $texts, $colors = [] ) {
+	public function format(
+		array $columns, array $texts, $colors = []
+	) :string {
 		$columns = $this->calculateColLengths( $columns );
 
 		$wrapped = [];
 		$maxlen = 0;
 
 		foreach ( $columns as $col => $width ) {
-			$wrapped[$col] = explode( "\n", $this->wordwrap( $texts[$col], $width, "\n", true ) );
+			$wrapped[$col] = explode(
+				"\n", $this->wordwrap( $texts[$col], $width, "\n", true )
+			);
 			$len = count( $wrapped[$col] );
 			if ( $len > $maxlen ) {
 				$maxlen = $len;
@@ -226,9 +239,10 @@ class TableFormatter {
 	 * @param int $len
 	 * @return string
 	 */
-	protected function pad( $string, $len ) {
+	protected function pad( string $string, int $len ) :string {
 		$strlen = $this->strlen( $string );
-		if ( $strlen > $len ) { return $string;
+		if ( $strlen > $len ) {
+			return $string;
 		}
 
 		$pad = $len - $strlen;
@@ -238,10 +252,10 @@ class TableFormatter {
 	/**
 	 * Measures char length in UTF-8 when possible
 	 *
-	 * @param $string
+	 * @param string $string
 	 * @return int
 	 */
-	protected function strlen( $string ) :int {
+	protected function strlen( string $string ) :int {
 		// don't count color codes
 		$string = preg_replace( "/\33\\[\\d+(;\\d+)?m/", '', $string );
 
@@ -258,11 +272,16 @@ class TableFormatter {
 	 * @param int|null $length
 	 * @return string
 	 */
-	protected function substr( $string, $start = 0, $length = null ) {
+	protected function substr(
+		string $string,
+		$start = 0,
+		$length = null
+	) :string {
 		if ( function_exists( 'mb_substr' ) ) {
 			return mb_substr( $string, $start, $length );
 		} else {
-			// substr() treats the third parameter different than mb_substr()
+			// substr() treats the third parameter different than
+			// mb_substr()
 			if ( $length ) {
 				return substr( $string, $start, $length );
 			} else {
@@ -279,7 +298,12 @@ class TableFormatter {
 	 * @return string
 	 * @link http://stackoverflow.com/a/4988494
 	 */
-	protected function wordwrap( $str, $width = 75, $break = "\n", $cut = false ) {
+	protected function wordwrap(
+		string $str,
+		int $width = 75,
+		string $break = "\n",
+		bool $cut = false
+	) :string {
 		$lines = explode( $break, $str );
 		foreach ( $lines as &$line ) {
 			$line = rtrim( $line );
@@ -299,7 +323,9 @@ class TableFormatter {
 					$actual = $word;
 					if ( $cut ) {
 						while ( $this->strlen( $actual ) > $width ) {
-							$line .= $this->substr( $actual, 0, $width ) . $break;
+							$line .= $this->substr(
+								$actual, 0, $width
+							) . $break;
 							$actual = $this->substr( $actual, $width );
 						}
 					}
