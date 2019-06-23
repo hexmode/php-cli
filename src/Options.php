@@ -168,7 +168,7 @@ class Options {
 			if ( strlen( $short ) > 1 ) {
 				throw new UsageException(
 					"Short options should be exactly one ASCII character",
-					E_UNKNOWN_OPT
+					Exception::E_UNKNOWN_OPT
 				);
 			}
 
@@ -532,27 +532,10 @@ class Options {
 	}
 
 	/**
-	 * Safely read the $argv PHP array across different PHP
-	 * configurations.  Will take care on register_globals and
-	 * register_argc_argv ini directives
-	 *
-	 * @throws Exception
-	 * @return array the $argv PHP array or PEAR error if not registered
+	 * @return array the $argv PHP array
 	 */
 	private function readPHPArgv() {
 		global $argv;
-		if ( !is_array( $argv ) ) {
-			if ( !@is_array( $_SERVER['argv'] ) ) {
-				if ( !@is_array( $GLOBALS['HTTP_SERVER_VARS']['argv'] ) ) {
-					throw new Exception(
-						"Could not read cmd args (register_argc_argv=Off?)",
-						Exception::E_ARG_READ
-					);
-				}
-				return $GLOBALS['HTTP_SERVER_VARS']['argv'];
-			}
-			return $_SERVER['argv'];
-		}
 		return $argv;
 	}
 }

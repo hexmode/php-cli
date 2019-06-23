@@ -191,7 +191,8 @@ abstract class CLI {
 			. $error->getLine()
 		);
 		$this->debug( $error->getTraceAsString() );
-		$this->fatal( $error->getMessage(), [], $error->getCode() );
+		// https://github.com/vimeo/psalm/issues/1148
+		$this->fatal( $error->getMessage(), [], (int)$error->getCode() );
 	}
 
 	/**
