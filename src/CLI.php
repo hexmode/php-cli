@@ -39,15 +39,24 @@ abstract class CLI {
 	/**
 	 * constructor
 	 *
-	 * Initialize the arguments, set up helper classes and set up the CLI environment
+	 * Initialize the arguments, set up helper classes and set up the
+	 * CLI environment
 	 *
-	 * @param bool $autocatch should exceptions be catched and handled automatically?
+	 * @param bool $autocatch should exceptions be catched and handled
+	 *   automatically?
+	 * @param callable $postCmd command to run after the error is
+	 *   shown.
 	 */
-	public function __construct( bool $autocatch = true ) {
+	public function __construct(
+		bool $autocatch = true,
+		?callable $postCmd = null
+	) {
 		if ( $autocatch ) {
-			set_exception_handler( function ( Throwable $err ) {
-				$this->fatalThrow( $err );
-			} );
+			set_exception_handler(
+				function ( Throwable $err ) use ( $postCmd ) {
+					$this->fatalThrow( $err, $postCmd );
+				}
+			);
 		}
 
 		$this->colors = new Colors();
@@ -88,7 +97,9 @@ abstract class CLI {
 	 */
 	public function run() :void {
 		if ( 'cli' != php_sapi_name() ) {
-			throw new Exception( 'This has to be run from the command line' );
+			throw new Exception(
+				'This has to be run from the command line'
+			);
 		}
 
 		$this->setup( $this->options );
@@ -109,20 +120,18 @@ abstract class CLI {
 	 */
 	protected function registerDefaultOptions() :void {
 		$this->options->registerOption(
-			'help',
-			'Display this help screen and exit immediately.',
-			'h'
+			'help', 'Display this help screen and exit immediately.', 'h'
 		);
 		$this->options->registerOption(
-			'no-colors',
-			'Do not use any colors in output. Useful when piping output to other tools or files.'
+			'no-colors', 'Do not use any colors in output. Useful when '
+			. 'pipingoutput to other tools or files.'
 		);
 		$this->options->registerOption(
 			'loglevel',
-			'Minimum level of messages to display. Default is ' . $this->colors->wrap( $this->logdefault, Colors::C_CYAN ) . '. ' .
-			'Valid levels are: debug, info, notice, success, warning, error, critical, alert, emergency.',
-			null,
-			'level'
+			'Minimum level of messages to display. Default is '
+			. $this->colors->wrap( $this->logdefault, Colors::C_CYAN )
+			. '. Valid levels are: debug, info, notice, success, warning, '
+			. 'error, critical, alert, emergency.', null, 'level'
 		);
 	}
 
@@ -184,15 +193,31 @@ abstract class CLI {
 	 * Handler for thrown objects
 	 *
 	 * @param Throwable $throw
+	 * @param callable $postCmd
 	 */
-	public function fatalThrow( Throwable $error ) :void {
+	public function fatalThrow(
+		Throwable $error,
+		?callable $postCmd = null
+	) :void {
 		$this->debug(
 			get_class( $error ) . ' caught in ' . $error->getFile() . ':'
 			. $error->getLine()
 		);
 		$this->debug( $error->getTraceAsString() );
-		// https://github.com/vimeo/psalm/issues/1148
-		$this->fatal( $error->getMessage(), [], (int)$error->getCode() );
+
+		if (
+			$postCmd === null
+			&& is_a( $error, __NAMESPACE__ . '\UsageException', true )
+		) {
+			$postCmd = function () {
+				echo $this->options->help();
+			};
+		}
+
+		// https://github.com/vimeo/psalm/issues/1148 for the cast to int
+		$this->fatal(
+			$error->getMessage(), [], (int)$error->getCode(), $postCmd
+		);
 	}
 
 	/**
@@ -200,13 +225,19 @@ abstract class CLI {
 	 *
 	 * @param string $error either an exception or an error message
 	 * @param array $context
+	 * @param int $code error code to exit with
+	 * @param callable $postCmd do this just before exiting
 	 */
 	public function fatal(
 		string $error,
 		array $context = [],
-		int $code = Exception::E_ANY
+		int $code = Exception::E_ANY,
+		?callable $postCmd = null
 	) :void {
 		$this->critical( $error, $context );
+		if ( is_callable( $postCmd ) ) {
+			call_user_func( $postCmd );
+		}
 		exit( $code );
 	}
 
