@@ -52,15 +52,24 @@ abstract class CLI {
 		?callable $postCmd = null
 	) {
 		if ( $autocatch ) {
-			set_exception_handler(
-				function ( Throwable $err ) use ( $postCmd ) {
-					$this->fatalThrow( $err, $postCmd );
-				}
-			);
+			$this->setAutocatch( $postCmd );
 		}
 
 		$this->colors = new Colors();
 		$this->options = new Options( $this->colors );
+	}
+
+	/**
+	 * Set up for automatic catches
+	 *
+	 * @param callable|null $postCmd
+	 */
+	public function setAutocatch( ?callable $postCmd = null ) :void {
+		set_exception_handler(
+			function ( Throwable $err ) use ( $postCmd ) {
+				$this->fatalThrow( $err, $postCmd );
+			}
+		);
 	}
 
 	/**
