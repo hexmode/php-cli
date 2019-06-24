@@ -44,13 +44,14 @@ class Options {
 			$this->colors = new Colors();
 		}
 
+		// default command
 		$this->setup = [
 			'' => [
 				'opts' => [],
 				'args' => [],
 				'help' => ''
 			]
-		]; // default command
+		];
 
 		$this->args = $this->readPHPArgv();
 		$this->bin = basename( array_shift( $this->args ) );
@@ -184,7 +185,7 @@ class Options {
 	 * This is run from CLI automatically and usually does not need to
 	 * be called directly
 	 *
-	 * @returns bool true if all is ok
+	 * @return bool true if all is ok
 	 * @throws UsageException
 	 */
 	public function checkArguments() :bool {
@@ -192,9 +193,10 @@ class Options {
 
 		$req = 0;
 		foreach ( $this->setup[$this->command]['args'] as $arg ) {
+			// last required arguments seen
 			if ( !$arg['required'] ) {
 				break;
-			} // last required arguments seen
+			}
 			$req++;
 		}
 
@@ -333,7 +335,8 @@ class Options {
 		) {
 			// it is a command!
 			$this->command = array_shift( $this->args );
-			$this->parseOptions(); // second pass
+			// Make another pass
+			$this->parseOptions();
 		}
 	}
 

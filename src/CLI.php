@@ -44,7 +44,7 @@ abstract class CLI {
 	 *
 	 * @param bool $autocatch should exceptions be catched and handled
 	 *   automatically?
-	 * @param callable $postCmd command to run after the error is
+	 * @param callable|null $postCmd command to run after the error is
 	 *   shown.
 	 */
 	public function __construct(
@@ -96,7 +96,7 @@ abstract class CLI {
 	 * @throws Exception
 	 */
 	public function run() :void {
-		if ( 'cli' != php_sapi_name() ) {
+		if ( 'cli' != PHP_SAPI ) {
 			throw new Exception(
 				'This has to be run from the command line'
 			);
@@ -192,8 +192,8 @@ abstract class CLI {
 	/**
 	 * Handler for thrown objects
 	 *
-	 * @param Throwable $throw
-	 * @param callable $postCmd
+	 * @param Throwable $error
+	 * @param callable|null $postCmd
 	 */
 	public function fatalThrow(
 		Throwable $error,
@@ -209,7 +209,7 @@ abstract class CLI {
 			$postCmd === null
 			&& is_a( $error, __NAMESPACE__ . '\UsageException', true )
 		) {
-			$postCmd = function () {
+			$postCmd = function () :void {
 				echo $this->options->help();
 			};
 		}
@@ -226,7 +226,7 @@ abstract class CLI {
 	 * @param string $error either an exception or an error message
 	 * @param array $context
 	 * @param int $code error code to exit with
-	 * @param callable $postCmd do this just before exiting
+	 * @param callable|null $postCmd do this just before exiting
 	 */
 	public function fatal(
 		string $error,
@@ -372,7 +372,10 @@ abstract class CLI {
 	 * @param array $context
 	 * @return string
 	 */
-	function interpolate( string $message, array $context = [] ) :string {
+	public function interpolate(
+		string $message,
+		array $context = []
+	) :string {
 		// build a replacement array with braces around the context keys
 		$replace = [];
 		foreach ( $context as $key => $val ) {

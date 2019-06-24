@@ -3,6 +3,7 @@
 namespace splitbrain\phpcli;
 
 use Throwable;
+
 /**
  * Class Exception
  *
@@ -13,12 +14,18 @@ use Throwable;
  * @license MIT
  */
 class Exception extends \RuntimeException {
-	const E_ANY = -1;              // no error code specified
-	const E_UNKNOWN_OPT = 1;       // Unrecognized option
-	const E_OPT_ARG_REQUIRED = 2;  // Option requires argument
-	const E_OPT_ARG_DENIED = 3;    // Option not allowed argument
-	const E_OPT_ABIGUOUS = 4;      // Option abiguous
-	const E_ARG_READ = 5;          // Could not read argv
+	// no error code specified
+	const E_ANY = -1;
+	// Unrecognized option
+	const E_UNKNOWN_OPT = 1;
+	// Option requires argument
+	const E_OPT_ARG_REQUIRED = 2;
+	// Option not allowed argument
+	const E_OPT_ARG_DENIED = 3;
+	// Option abiguous
+	const E_OPT_ABIGUOUS = 4;
+	// Could not read argv
+	const E_ARG_READ = 5;
 
 	/**
 	 * @param string $message The Exception message to throw.

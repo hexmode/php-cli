@@ -169,7 +169,8 @@ class TableFormatter {
 
 		// assign remaining space
 		if ( $fluid < 0 ) {
-			$columns[$idx] += ( $remain ); // add to last column
+			// add to last column
+			$columns[$idx] += ( $remain );
 		} else {
 			$columns[$fluid] = $remain;
 		}
