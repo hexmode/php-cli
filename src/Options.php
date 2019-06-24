@@ -152,11 +152,11 @@ class Options {
 		string $long,
 		string $help,
 		?string $short = null,
-		$needsarg = false,
+		bool $needsarg = false,
 		string $command = ''
 	) :void {
 		if ( !isset( $this->setup[$command] ) ) {
-			throw new Exception( "Command $command not registered" );
+			throw new UsageException( "Command $command not registered" );
 		}
 
 		$this->setup[$command]['opts'][$long] = [
@@ -167,7 +167,7 @@ class Options {
 
 		if ( $short ) {
 			if ( strlen( $short ) > 1 ) {
-				throw new UsageException(
+				throw new Exception(
 					"Short options should be exactly one ASCII character",
 					Exception::E_UNKNOWN_OPT
 				);
@@ -207,6 +207,39 @@ class Options {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Could this be an option?
+	 *
+	 * @param string $opt
+	 * @return bool
+	 */
+	protected function isNotAnOption( string $opt ) :bool {
+		if (
+			!isset( $this->setup[$this->command]['opts'][$opt] )
+			&& !isset( $this->setup['']['opts'][$opt] )
+		) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Could this be a short option?
+	 *
+	 * @param string $opt
+	 * @return bool
+	 */
+	protected function isNotAShortOption( string $opt ) :bool {
+		if ( (
+				 strlen( $opt ) === 1
+				 && !isset( $this->setup[$this->command]['short'][$opt] )
+				 && !isset( $this->setup['']['short'][$opt] )
+		) ) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -264,7 +297,7 @@ class Options {
 				$opt = array_shift( $arg );
 				$val = array_shift( $arg );
 
-				if ( !isset( $this->setup[$this->command]['opts'][$opt] ) ) {
+				if ( $this->isNotAnOption( $opt ) ) {
 					throw new UsageException(
 						"No such option '$opt'", Exception::E_UNKNOWN_OPT
 					);
@@ -292,21 +325,22 @@ class Options {
 				}
 
 				continue;
-			}
-
-			// short option
-			$opt = substr( $arg, 1 );
-			if ( !isset( $this->setup[$this->command]['short'][$opt] ) ) {
-				throw new UsageException(
-					"No such option $arg", Exception::E_UNKNOWN_OPT
-				);
 			} else {
-				// store it under long name
-				$opt = $this->setup[$this->command]['short'][$opt];
+				// short option
+				$opt = substr( $arg, 1, 1 );
+				if ( $this->isNotAShortOption( $opt ) ) {
+					throw new UsageException(
+						"No such option $arg", Exception::E_UNKNOWN_OPT
+					);
+				} else {
+					// store it under long name
+					$opt = $this->setup[$this->command]['short'][$opt]
+						 ??  $this->setup['']['short'][$opt];
+				}
 			}
 
 			// argument required?
-			if ( $this->setup[$this->command]['opts'][$opt]['needsarg'] ) {
+			if ( $this->setup[$this->command]['opts'][$opt]['needsarg'] ?? $this->setup['']['opts'][$opt]['needsarg'] ) {
 				$val = null;
 				if (
 					$i + 1 < $argc &&
