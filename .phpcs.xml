@@ -3,6 +3,7 @@
 	<rule ref="./vendor/mediawiki/mediawiki-codesniffer/MediaWiki">
 		<exclude name="MediaWiki.PHP70Features"/>
 		<exclude name="MediaWiki.PHP71Features"/>
+                <exclude name="MediaWiki.Usage.ForbiddenFunctions.proc_open"/>
                 <exclude name="MediaWiki.Commenting.FunctionComment.NotPunctuationReturn"/>
 	</rule>
 	<file>src</file>
