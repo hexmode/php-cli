@@ -360,7 +360,8 @@ abstract class CLI {
 	 */
 	public function log( $level, $message, array $context = [] ) :void {
 		// is this log level wanted?
-		if ( !isset( $this->loglevel[$level] ) ) { return;
+		if ( !isset( $this->loglevel[$level] ) ) {
+			return;
 		}
 
 		/** @var string $prefix */
