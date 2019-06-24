@@ -8,5 +8,4 @@ namespace splitbrain\phpcli;
  * @author Mark A. Hershberger <mah@nichework.com>
  * @license MIT
  */
-class UsageException extends Exception {
-}
+class UsageException extends Exception {}

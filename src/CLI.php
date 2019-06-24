@@ -174,7 +174,7 @@ abstract class CLI {
 	}
 
 	/**
-	 * Wrapper around the option parsing
+	 * wrapper around the option parsing
 	 */
 	protected function parseOptions() :void {
 		$this->options->parseOptions();
@@ -360,14 +360,16 @@ abstract class CLI {
 	 */
 	public function log( $level, $message, array $context = [] ) :void {
 		// is this log level wanted?
-		if ( !isset( $this->loglevel[$level] ) ) { return;
+		if ( !isset( $this->loglevel[$level] ) ) {
+			return;
 		}
 
 		/** @var string $prefix */
 		/** @var string $color */
 		/** @var resource $channel */
 		list( $prefix, $color, $channel ) = $this->loglevel[$level];
-		if ( !$this->colors->isEnabled() ) { $prefix = '';
+		if ( !$this->colors->isEnabled() ) {
+			$prefix = '';
 		}
 
 		$message = $this->interpolate( $message, $context );
