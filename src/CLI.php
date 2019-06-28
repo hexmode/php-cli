@@ -223,7 +223,7 @@ abstract class CLI {
 		$this->debug( $error->getTraceAsString() );
 
 		if ( $postCmd !== null ) {
-			$this->autocatch = $postCmd;
+			$this->hasAutocatch = true;
 		}
 		if (
 			$postCmd === null
