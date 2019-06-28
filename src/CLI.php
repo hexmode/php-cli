@@ -148,7 +148,7 @@ abstract class CLI {
 			'Minimum level of messages to display. Default is '
 			. $this->colors->wrap( $this->logdefault, Colors::C_CYAN )
 			. '. Valid levels are: debug, info, notice, success, warning, '
-			. 'error, critical, alert, emergency.', null, 'level'
+			. 'error, critical, alert, emergency.', null, true
 		);
 	}
 
@@ -171,7 +171,7 @@ abstract class CLI {
 	protected function setupLogging() :void {
 		$level = $this->options->getOpt( 'loglevel', $this->logdefault );
 		if ( !isset( $this->loglevel[$level] ) ) {
-			$this->fatal( 'Unknown log level' );
+			$this->fatal( "Unknown log level: $level" );
 		}
 		foreach ( array_keys( $this->loglevel ) as $l ) {
 			if ( $l === $level ) {

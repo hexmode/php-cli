@@ -268,7 +268,7 @@ class Options {
 			// The special element '--' means explicit end of
 			// options. Treat the rest of the arguments as non-options
 			// and end the loop.
-			if ( $arg == '--' ) {
+			if ( $arg === '--' ) {
 				$non_opts = array_merge(
 					$non_opts, array_slice( $this->args, $i + 1 )
 				);
@@ -276,7 +276,7 @@ class Options {
 			}
 
 			// '-' is stdin - a normal argument
-			if ( $arg == '-' ) {
+			if ( $arg === '-' ) {
 				$non_opts = array_merge(
 					$non_opts, array_slice( $this->args, $i )
 				);
@@ -284,7 +284,7 @@ class Options {
 			}
 
 			// first non-option
-			if ( $arg{0} != '-' ) {
+			if ( $arg{0} !== '-' ) {
 				$non_opts = array_merge(
 					$non_opts, array_slice( $this->args, $i )
 				);
@@ -292,7 +292,7 @@ class Options {
 			}
 
 			// long option
-			if ( strlen( $arg ) > 1 && $arg{1} == '-' ) {
+			if ( strlen( $arg ) > 1 && $arg{1} === '-' ) {
 				$arg = explode( '=', substr( $arg, 2 ), 2 );
 				$opt = array_shift( $arg );
 				$val = array_shift( $arg );
@@ -304,9 +304,11 @@ class Options {
 				}
 
 				// argument required?
-				if (
-					$this->setup[$this->command]['opts'][$opt]['needsarg']
-				) {
+				$needsArg
+					= $this->setup[$this->command]['opts'][$opt]['needsarg']
+					?? $this->setup['']['opts'][$opt]['needsarg']
+					?? false;
+				if ( $needsArg ) {
 					if (
 						is_null( $val ) && $i + 1 < $argc &&
 						!preg_match( '/^--?[\w]/', $this->args[$i + 1] )
@@ -340,7 +342,9 @@ class Options {
 			}
 
 			// argument required?
-			if ( $this->setup[$this->command]['opts'][$opt]['needsarg'] ?? $this->setup['']['opts'][$opt]['needsarg'] ) {
+			$required = $this->setup[$this->command]['opts'][$opt]['needsarg']
+					  ?? $this->setup['']['opts'][$opt]['needsarg'];
+			if ( $required ) {
 				$val = null;
 				if (
 					$i + 1 < $argc &&
@@ -349,8 +353,10 @@ class Options {
 					$val = $this->args[++$i];
 				}
 				if ( is_null( $val ) ) {
-					throw new Exception( "Option $arg requires an argument",
-						Exception::E_OPT_ARG_REQUIRED );
+					throw new Exception(
+						"Option $arg requires an argument",
+						Exception::E_OPT_ARG_REQUIRED
+					);
 				}
 				$this->options[$opt] = $val;
 			} else {
@@ -390,7 +396,6 @@ class Options {
 		if ( $option === null ) {
 			return $this->options;
 		}
-
 		if ( isset( $this->options[$option] ) ) {
 			return $this->options[$option];
 		}
