@@ -54,9 +54,8 @@ class Colors {
 			$this->enabled = false;
 			return;
 		}
-		if ( $this->console->isSupported() ) {
+		if ( !$this->console->isSupported() ) {
 			$this->enabled = false;
-			return;
 		}
 	}
 
@@ -92,9 +91,10 @@ class Colors {
 	 * @throws Exception
 	 */
 	public function ptln( $line, $color, $channel = STDOUT ) :void {
-		fwrite(
-			$channel, $this->console->apply( $color, rtrim( $line ) . "\n" )
-		);
+		if ( $this->enabled ) {
+			$line = $this->console->apply( $color, rtrim( $line ) );
+		}
+		fwrite( $channel, "$line\n" );
 	}
 
 	/**
@@ -107,6 +107,10 @@ class Colors {
 	 * @throws Exception
 	 */
 	public function wrap( $text, $color ) {
-		return $this->console->apply( $color, $text );
+		$ret = $text;
+		if ( $this->enabled ) {
+			$ret = $this->console->apply( $color, $text );
+		}
+		return $ret;
 	}
 }

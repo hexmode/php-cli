@@ -36,6 +36,9 @@ abstract class CLI {
 	/** @var string $logdefault log level */
 	protected $logdefault = 'info';
 
+	/** @var bool $autocatch has error handler */
+	protected $hasAutocatch;
+
 	/**
 	 * constructor
 	 *
@@ -65,11 +68,16 @@ abstract class CLI {
 	 * @param callable|null $postCmd
 	 */
 	public function setAutocatch( ?callable $postCmd = null ) :void {
-		set_exception_handler(
-			function ( Throwable $err ) use ( $postCmd ) {
-				$this->fatalThrow( $err, $postCmd );
+		if ( !$this->hasAutocatch ) {
+			set_exception_handler(
+				function ( Throwable $err ) use ( $postCmd ) {
+					$this->fatalThrow( $err, $postCmd );
+				}
+			);
+			if ( $postCmd ) {
+				$this->hasAutocatch = true;
 			}
-		);
+		}
 	}
 
 	/**
@@ -166,7 +174,7 @@ abstract class CLI {
 			$this->fatal( 'Unknown log level' );
 		}
 		foreach ( array_keys( $this->loglevel ) as $l ) {
-			if ( $l == $level ) {
+			if ( $l === $level ) {
 				break;
 			}
 			unset( $this->loglevel[$l] );
@@ -214,6 +222,9 @@ abstract class CLI {
 		);
 		$this->debug( $error->getTraceAsString() );
 
+		if ( $postCmd !== null ) {
+			$this->autocatch = $postCmd;
+		}
 		if (
 			$postCmd === null
 			&& is_a( $error, __NAMESPACE__ . '\UsageException', true )
@@ -367,7 +378,7 @@ abstract class CLI {
 		/** @var string $prefix */
 		/** @var string $color */
 		/** @var resource $channel */
-		list( $prefix, $color, $channel ) = $this->loglevel[$level];
+		[ $prefix, $color, $channel ] = $this->loglevel[$level];
 		if ( !$this->colors->isEnabled() ) {
 			$prefix = '';
 		}
