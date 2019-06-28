@@ -54,12 +54,12 @@ abstract class CLI {
 		bool $autocatch = true,
 		?callable $postCmd = null
 	) {
+		$this->hasAutocatch = false;
+		$this->colors = new Colors();
+		$this->options = new Options( $this->colors );
 		if ( $autocatch ) {
 			$this->setAutocatch( $postCmd );
 		}
-
-		$this->colors = new Colors();
-		$this->options = new Options( $this->colors );
 	}
 
 	/**
@@ -365,7 +365,7 @@ abstract class CLI {
 	}
 
 	/**
-	 * @param string $level
+	 * @param mixed $level
 	 * @param string $message
 	 * @param array $context
 	 */
