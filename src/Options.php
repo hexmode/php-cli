@@ -143,7 +143,7 @@ class Options {
 	 * @param string $long multi character option (specified with --)
 	 * @param string $help help text for this option
 	 * @param string|null $short one character option (specified with -)
-	 * @param bool|string $needsarg does this option require an argument?
+	 * @param string|bool $needsarg does this option require an argument?
 	 *   give it a name here
 	 * @param string $command what command does this option apply to
 	 * @throws Exception
@@ -152,7 +152,7 @@ class Options {
 		string $long,
 		string $help,
 		?string $short = null,
-		bool $needsarg = false,
+		$needsarg = false,
 		string $command = ''
 	) :void {
 		if ( !isset( $this->setup[$command] ) ) {
