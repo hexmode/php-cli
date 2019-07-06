@@ -22,14 +22,14 @@ abstract class CLI {
 	/** @var array PSR-3 compatible loglevels and their prefix, color,
 	 * output channel */
 	protected $loglevel = [
-		'debug' => [ '', Colors::C_LIGHTGRAY, STDOUT ],
-		'info' => [ 'ℹ ', Colors::C_CYAN, STDOUT ],
-		'notice' => [ '☛ ', Colors::C_CYAN, STDOUT ],
-		'success' => [ '✓ ', Colors::C_GREEN, STDOUT ],
-		'warning' => [ '⚠ ', Colors::C_BROWN, STDERR ],
-		'error' => [ '✗ ', Colors::C_RED, STDERR ],
-		'critical' => [ '☠ ', Colors::C_LIGHTRED, STDERR ],
-		'alert' => [ '✖ ', Colors::C_LIGHTRED, STDERR ],
+		'debug'     => [ '', Colors::C_LIGHTGRAY, STDOUT ],
+		'info'      => [ 'ℹ ', Colors::C_CYAN, STDOUT ],
+		'notice'    => [ '☛ ', Colors::C_CYAN, STDOUT ],
+		'success'   => [ '✓ ', Colors::C_GREEN, STDOUT ],
+		'warning'   => [ '⚠ ', Colors::C_BROWN, STDERR ],
+		'error'     => [ '✗ ', Colors::C_RED, STDERR ],
+		'critical'  => [ '☠ ', Colors::C_LIGHTRED, STDERR ],
+		'alert'     => [ '✖ ', Colors::C_LIGHTRED, STDERR ],
 		'emergency' => [ '✘ ', Colors::C_LIGHTRED, STDERR ],
 	];
 
