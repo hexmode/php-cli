@@ -233,11 +233,12 @@ abstract class CLI {
 				echo $this->options->help();
 			};
 		}
-
 		// https://github.com/vimeo/psalm/issues/1148 for the cast to int
-		$this->fatal(
-			$error->getMessage(), [], (int)$error->getCode(), $postCmd
-		);
+		$code = (int)$error->getCode();
+		if ( $code === 0 ) {
+			$code = Exception::E_ANY;
+		}
+		$this->fatal( $error->getMessage(), [], $code, $postCmd );
 	}
 
 	/**

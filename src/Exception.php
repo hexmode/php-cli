@@ -35,12 +35,9 @@ class Exception extends \RuntimeException {
 	 */
 	public function __construct(
 		string $message = "",
-		int $code = 0,
+		int $code = self::E_ANY,
 		Throwable $previous = null
 	) {
-		if ( !$code ) {
-			$code = self::E_ANY;
-		}
 		parent::__construct( $message, $code, $previous );
 	}
 }
